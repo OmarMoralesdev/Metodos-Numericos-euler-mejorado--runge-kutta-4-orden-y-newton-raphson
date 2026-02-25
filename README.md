@@ -143,7 +143,7 @@ Para modificar o extender los métodos:
 2. Prueba los cambios ejecutando el programa
 3. Asegúrate de que los cambios no rompan la funcionalidad existente
 
-## ⚠️ Notas Importantes
+##  Notas Importantes
 
 - Usa sintaxis Python estándar en las ecuaciones
 - Reemplaza `^` con `**` para potencias

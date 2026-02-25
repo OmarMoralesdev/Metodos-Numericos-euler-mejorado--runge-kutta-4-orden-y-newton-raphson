@@ -50,27 +50,26 @@ def metodo_runge_kutta():
     """Ejecuta Runge-Kutta 4"""
     try:
         print("\n--- MÉTODO DE RUNGE-KUTTA 4 ---")
-        print("Ingresa tu ecuación diferencial dy/dt = f(t, y)")
+        print("Ingresa tu ecuación diferencial dy/dx = f(x, y)")
         print("Ejemplos:")
-        print("  - y - t**2 + 1")
-        print("  - -2*t*y")
-        print("  - y * np.sin(t)")
+        print("  - y - x**2 + 1")
+        print("  - -2*x*y")
+        print("  - y * np.sin(x)")
         
         ecuacion = input("Tu ecuación: ")
         
-        def f(t, y):
-            x = t
+        def f(x, y):
             return eval(ecuacion)
         
-        t0 = float(input("t inicial (t0): "))
+        x0 = float(input("x inicial (x0): "))
         y0 = float(input("y inicial (y0): "))
         h = float(input("Paso (h): "))
-        t_end = float(input("t final: "))
+        x_end = float(input("x final: "))
         
-        t, y = runge_kutta4(f, t0, y0, t_end, h)
+        x, y, k1, k2, k3, k4, k = runge_kutta4(f, x0, y0, x_end, h)
         
-        tabla_rk4(t, y)
-        grafica_rk4(t, y)
+        tabla_rk4(x, y, k1, k2, k3, k4, k)
+        grafica_rk4(x, y)
     except Exception as e:
         print(f"\n Error: {str(e)}")
         print("Verifica tu entrada e intenta de nuevo.")
