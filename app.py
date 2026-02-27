@@ -1,14 +1,45 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
+import sympy as sp
+import pandas as pd
 from metodos_numericos.euler_mejorado import euler_mejorado
 from metodos_numericos.runge_kutta4 import runge_kutta4
 from metodos_numericos.newton_raphson import newton_raphson
 
+# Función para resolver ODE analíticamente con SymPy
+def resolver_con_sympy(ecuacion_str, x0, y0):
+    """Intenta resolver la ODE analíticamente usando SymPy."""
+    try:
+        x_sym = sp.symbols('x')
+        y_sym = sp.Function('y')(x_sym)
+        
+        # Parsear la expresión con y como símbolo
+        f_sym = sp.sympify(ecuacion_str, locals={'x': x_sym, 'y': y_sym})
+        
+        # Definir la ecuación diferencial: dy/dx = f(x,y)
+        diffeq = sp.Eq(y_sym.diff(x_sym), f_sym)
+        
+        # Resolver con condición inicial
+        sol = sp.dsolve(diffeq, y_sym, ics={y_sym.subs(x_sym, x0): y0})
+        
+        # Retornar una función lambda para evaluar rápido
+        solucion_lambda = sp.lambdify(x_sym, sol.rhs, modules=['numpy', 'sympy'])
+        
+        # Validar que la función funciona
+        try:
+            test = float(solucion_lambda(x0))
+        except:
+            return None
+        
+        return solucion_lambda
+    except:
+        return None
+
 st.set_page_config(page_title="Métodos Numéricos", layout="wide")
 
 # Título principal
-st.title("Métodos Numéricos")
+st.title("Métodos Numéricos - Jesus Omar Morales Valenzuela 8 B")
 st.markdown("---")
 
 # Menú lateral
@@ -29,7 +60,7 @@ if metodo == "Euler Mejorado":
         ecuacion = st.text_input(
             "Ecuación f(x, y):",
             value="x + 2*y",
-            help="Ejemplos: x + 2*y, x - y, y * np.sin(x)"
+            help="Ejemplos: x + 2*y, x - y, y*sin(x), exp(y)"
         )
         x0 = st.number_input("x inicial (x0):", value=0.0)
         y0 = st.number_input("y inicial (y0):", value=1.0)
@@ -38,44 +69,65 @@ if metodo == "Euler Mejorado":
     
     with col2:
         st.subheader("Ejemplos")
-        st.code("x + 2*y\nx - y\ny * np.sin(x)\nx**2 + y")
+        st.code("x + 2*y\nx - y\ny*sin(x)")
     
     if st.button("Calcular", key="euler"):
         try:
+            # Convertir ecuación a función con SymPy
+            x_sym, y_sym = sp.symbols('x y')
+            ecuacion_sym = sp.sympify(ecuacion)
+            f_lambda = sp.lambdify((x_sym, y_sym), ecuacion_sym, 'numpy')
+            
             def f(x, y):
-                return eval(ecuacion)
+                return f_lambda(x, y)
             
-            x, y = euler_mejorado(f, x0, y0, h, x_final)
+            # Intentar obtener la solución exacta
+            f_exacta = resolver_con_sympy(ecuacion, x0, y0)
             
-            # Calcular y(n+1) - valor predictor y mejorado
-            y_pred = []
-            y_mejorado = []
-            error_abs = []
-            for i in range(len(x) - 1):
-                k1 = f(x[i], y[i])
-                y_pred_val = y[i] + h * k1
-                y_pred.append(y_pred_val)
-                k2 = f(x[i+1], y_pred_val)
-                y_mej = y[i] + (h / 2) * (k1 + k2)
-                y_mejorado.append(y_mej)
-                error_abs.append(abs(y_mej - y[i]))
-            y_pred.append("-")
-            y_mejorado.append("-")
-            error_abs.append("-")
+            # Calcular Euler Mejorado
+            x_vals, y_vals = euler_mejorado(f, x0, y0, h, x_final)
+            
+            # Construir tabla con detalles
+            datos_tabla = []
+            for i in range(len(x_vals)):
+                x_i = x_vals[i]
+                y_i = y_vals[i]
+                
+                # Cálculo de una fila (k1, k2, y predictor, y mejorado)
+                if i < len(x_vals) - 1:
+                    k1 = f(x_i, y_i)
+                    y_pred = y_i + h * k1
+                    k2 = f(x_vals[i+1], y_pred)
+                    y_mej = y_i + (h/2) * (k1 + k2)
+                    err_abs = abs(y_mej - y_i)
+                    
+                    datos_tabla.append({
+                        "x": round(x_i, 4),
+                        "y": round(y_i, 10),
+                        "y*": round(y_pred, 10),
+                        "y_next": round(y_mej, 10),
+                        "Error Absoluto": round(err_abs, 10)
+                    })
+                else:
+                    datos_tabla.append({
+                        "x": round(x_i, 4),
+                        "y": round(y_i, 10),
+                        "y*": np.nan,"y_next": np.nan,
+                        "Error Absoluto": np.nan
+                    })
             
             # Mostrar tabla
             st.subheader("Resultados")
-            df_data = {"x": x, 
-                       "y": y,
-                       "y(n+1)": y_pred,
-                       "y(n+1) Mejorado": y_mejorado,
-                       "Error Absoluto": error_abs,
-                       }
-            st.dataframe(df_data, use_container_width=True)
+            st.dataframe(pd.DataFrame(datos_tabla), width='stretch')
+            
+            if f_exacta is None:
+                st.info("SymPy no pudo encontrar solución analítica exacta. El 'Error Absoluto' no está disponible.")
             
             # Mostrar gráfica
             fig, ax = plt.subplots(figsize=(10, 6))
-            ax.plot(x, y, 'r-o', linewidth=2, markersize=6)
+            ax.plot(x_vals, y_vals, 'r-o', linewidth=2, markersize=6, label='Euler Mejorado')
+  
+            
             ax.grid(True, alpha=0.3)
             ax.set_xlabel('x', fontsize=12)
             ax.set_ylabel('y', fontsize=12)
@@ -83,7 +135,7 @@ if metodo == "Euler Mejorado":
             st.pyplot(fig)
             
         except Exception as e:
-            st.error(f" Error: {str(e)}")
+            st.error(f"Error: {str(e)}")
 
 # RUNGE-KUTTA 4
 elif metodo == "Runge-Kutta 4":
@@ -97,7 +149,7 @@ elif metodo == "Runge-Kutta 4":
         ecuacion = st.text_input(
             "Ecuación f(x, y):",
             value="y - x**2 + 1",
-            help="Ejemplos: y - x**2 + 1, -2*x*y, y * np.sin(x)"
+            help="Ejemplos: y - x**2 + 1, -2*x*y, y*sin(x)"
         )
         x0 = st.number_input("x inicial (x0):", value=0.0, key="rk4_x0")
         y0 = st.number_input("y inicial (y0):", value=0.5, key="rk4_y0")
@@ -106,12 +158,17 @@ elif metodo == "Runge-Kutta 4":
     
     with col2:
         st.subheader("Ejemplos")
-        st.code("y - x**2 + 1\n-2*x*y\ny * np.sin(x)\nx + y")
+        st.code("y - x**2 + 1\n-2*x*y\ny*sin(x)\nx + y")
     
     if st.button("Calcular", key="rk4"):
         try:
+            # Convertir ecuación a función con SymPy
+            x_sym, y_sym = sp.symbols('x y')
+            ecuacion_sym = sp.sympify(ecuacion)
+            f_lambda = sp.lambdify((x_sym, y_sym), ecuacion_sym, 'numpy')
+            
             def f(x, y):
-                return eval(ecuacion)
+                return f_lambda(x, y)
             
             x, y, k1, k2, k3, k4 = runge_kutta4(f, x0, y0, x_end, h)
             
@@ -120,13 +177,13 @@ elif metodo == "Runge-Kutta 4":
             df_data = {
                 "x": x,
                 "y": y,
-                "y(n+1)": list(y[1:]) + ["-"],
-                "K1": list(k1) + ["-"],
-                "K2": list(k2) + ["-"],
-                "K3": list(k3) + ["-"],
-                "K4": list(k4) + ["-"],
+                "y(n+1)": list(y[1:]) + [np.nan],
+                "K1": list(k1) + [np.nan],
+                "K2": list(k2) + [np.nan],
+                "K3": list(k3) + [np.nan],
+                "K4": list(k4) + [np.nan],
             }
-            st.dataframe(df_data, use_container_width=True)
+            st.dataframe(df_data, width='stretch')
             
             # Mostrar gráfica
             fig, ax = plt.subplots(figsize=(10, 6))
@@ -152,12 +209,7 @@ elif metodo == "Newton-Raphson":
         ecuacion = st.text_input(
             "Función f(x):",
             value="x**2 - 4",
-            help="Ejemplos: x**2 - 4, x**3 - 2*x - 5, np.sin(x) - x/2"
-        )
-        derivada = st.text_input(
-            "Derivada f'(x):",
-            value="2*x",
-            help="La derivada de tu función"
+            help="Ejemplos: x**2 - 4, x**3 - 2*x - 5, sin(x) - x/2"
         )
         x0 = st.number_input("x inicial (x0):", value=3.0, key="nr_x0")
         tol = st.number_input("Tolerancia:", value=1e-7, format="%.0e", key="nr_tol")
@@ -165,25 +217,40 @@ elif metodo == "Newton-Raphson":
     
     with col2:
         st.subheader("Ejemplos")
-        st.code("f(x) = x**2 - 4\nf'(x) = 2*x\n\nf(x) = x**3 - 2*x - 5\nf'(x) = 3*x**2 - 2")
+        st.code("x**2 - 4\nx**3 - 2*x - 5\nsin(x) - x/2\nx**2 - 2")
     
     if st.button("Calcular", key="nr"):
         try:
-            def f(x):
-                return eval(ecuacion)
+            # Crear variable simbólica
+            x = sp.Symbol('x')
             
-            def df(x):
-                return eval(derivada)
+            # Parsear la ecuación directamente (reconoce funciones automáticamente)
+            ecuacion_sym = sp.sympify(ecuacion.replace('^', '**'))
+            
+            # Calcular derivada automáticamente
+            derivada_sym = sp.diff(ecuacion_sym, x)
+            
+            # Convertir a funciones evaluables
+            def f(x_val):
+                return float(ecuacion_sym.subs(x, x_val))
+            
+            def df(x_val):
+                return float(derivada_sym.subs(x, x_val))
             
             raiz, iteraciones = newton_raphson(f, df, x0, tol, max_iter)
             
             if raiz is not None:
                 st.success(f" Raíz encontrada: **{raiz:.10f}**")
                 
-                # Mostrar tabla de iteraciones
+                # Mostrar tabla de iteraciones con detalles
                 st.subheader("Iteraciones")
-                df_iter = {"x": iteraciones}
-                st.dataframe(df_iter, use_container_width=True)
+                tabla_iteraciones = {
+                    "i": list(range(len(iteraciones))),
+                    "x": iteraciones,
+                    "f(x)": [f(xi) for xi in iteraciones],
+                    "f'(x)": [df(xi) for xi in iteraciones]
+                }
+                st.dataframe(tabla_iteraciones, width='stretch')
                 
                 # Mostrar gráfica
                 x_min = min(iteraciones) - 2
@@ -194,7 +261,7 @@ elif metodo == "Newton-Raphson":
                 fig, ax = plt.subplots(figsize=(10, 6))
                 ax.plot(x_vals, y_vals, 'g-', linewidth=2, label='f(x)')
                 ax.axhline(y=0, color='k', linestyle='--', alpha=0.3)
-                ax.plot(iteraciones, [f(x) for x in iteraciones], 'ro-', markersize=8, label='Iteraciones')
+                ax.plot(iteraciones, [f(x_val) for x_val in iteraciones], 'ro-', markersize=8, label='Iteraciones')
                 ax.plot(raiz, 0, 'r*', markersize=20, label=f'Raíz = {raiz:.6f}')
                 ax.grid(True, alpha=0.3)
                 ax.set_xlabel('x', fontsize=12)
@@ -212,6 +279,6 @@ elif metodo == "Newton-Raphson":
 st.markdown("---")
 st.markdown("""
     <div style='text-align: center'>
-        <p>Métodos Numéricos • Desarrollado con Streamlit</p>
+        <p>Métodos Numéricos • Desarrollado por Jesus Omar Morales Valenzuela 8 B</p>
     </div>
 """, unsafe_allow_html=True)
