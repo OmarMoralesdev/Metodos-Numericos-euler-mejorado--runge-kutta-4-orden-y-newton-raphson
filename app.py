@@ -7,6 +7,149 @@ from metodos_numericos.euler_mejorado import euler_mejorado
 from metodos_numericos.runge_kutta4 import runge_kutta4
 from metodos_numericos.newton_raphson import newton_raphson
 
+# Estilos corporativos personalizados
+st.markdown("""
+    <style>
+        :root {
+            --color-primary: #367C2B;
+            --color-accent: #FFCC00;
+            --color-dark: #1a3f1f;
+            --color-light: #f5f5f5;
+        }
+        
+        * {
+            font-family: 'Segoe UI', 'Trebuchet MS', sans-serif;
+        }
+        
+        body {
+            background-color: #ffffff;
+            color: #2c3e50;
+        }
+        
+        /* Encabezados */
+        h1 {
+            color: #367C2B;
+            border-bottom: 3px solid #FFCC00;
+            padding-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        h2 {
+            color: #367C2B;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+        
+        h3 {
+            color: #1a3f1f;
+            font-weight: 600;
+        }
+        
+        /* Botones */
+        .stButton > button {
+            background-color: #367C2B;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 24px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        
+        .stButton > button:hover {
+            background-color: #1a3f1f;
+            box-shadow: 0 2px 8px rgba(54, 124, 43, 0.3);
+        }
+        
+        /* Inputs */
+        .stTextInput > div > div > input,
+        .stNumberInput > div > div > input {
+            border-color: #367C2B;
+            border-radius: 4px;
+        }
+        
+        .stTextInput > div > div > input:focus,
+        .stNumberInput > div > div > input:focus {
+            border-color: #FFCC00;
+            box-shadow: 0 0 0 2px rgba(54, 124, 43, 0.2);
+        }
+        
+        /* Selectbox */
+        .stSelectbox > div > div > div {
+            border-color: #367C2B;
+            border-radius: 4px;
+        }
+        
+        /* Dataframe */
+        .dataframe {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        .dataframe thead th {
+            background-color: #367C2B;
+            color: white;
+            font-weight: 600;
+            padding: 12px;
+            text-align: left;
+            border: none;
+        }
+        
+        .dataframe tbody td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .dataframe tbody tr:hover {
+            background-color: #f0f8f5;
+        }
+        
+        /* Info, Success, Warning, Error */
+        .stSuccess {
+            background-color: #e8f5e9;
+            border-left: 4px solid #367C2B;
+            border-radius: 4px;
+        }
+        
+        .stInfo {
+            background-color: #e3f2fd;
+            border-left: 4px solid #367C2B;
+            border-radius: 4px;
+        }
+        
+        .stWarning {
+            background-color: #fff3e0;
+            border-left: 4px solid #f57c00;
+            border-radius: 4px;
+        }
+        
+        .stError {
+            background-color: #ffebee;
+            border-left: 4px solid #c62828;
+            border-radius: 4px;
+        }
+        
+        /* Línea divisora */
+        hr {
+            border-color: #FFCC00;
+            margin: 30px 0;
+        }
+        
+        /* Sidebar */
+        .sidebar .sidebar-content {
+            background-color: #f5f5f5;
+        }
+        
+        /* Contenedor principal */
+        .main {
+            background-color: #ffffff;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # Función para resolver ODE analíticamente con SymPy
 def resolver_con_sympy(ecuacion_str, x0, y0):
     """Intenta resolver la ODE analíticamente usando SymPy."""
@@ -36,10 +179,24 @@ def resolver_con_sympy(ecuacion_str, x0, y0):
     except:
         return None
 
-st.set_page_config(page_title="Métodos Numéricos", layout="wide")
+st.set_page_config(page_title="Métodos Numéricos", layout="wide", initial_sidebar_state="expanded")
 
-# Título principal
-st.title("Métodos Numéricos - Jesus Omar Morales Valenzuela 8 B")
+# Forzar tema claro
+st.markdown("""
+    <script>
+        const htmlElement = document.documentElement;
+        htmlElement.setAttribute('data-theme', 'light');
+    </script>
+""", unsafe_allow_html=True)
+
+# Encabezado corporativo
+st.markdown("""
+    <div style='background: linear-gradient(135deg, #367C2B 0%, #1a3f1f 100%); padding: 40px; text-align: center; border-radius: 8px; margin-bottom: 30px;'>
+        <h1 style='color: white; border: none; margin: 0; font-size: 2.5em; letter-spacing: 2px;'>METODOS NUMERICOS</h1>
+        <p style='color: #FFCC00; margin: 10px 0 0 0; font-size: 1.1em; letter-spacing: 1px;'>Jesus Omar Morales Valenzuela - Grupo 8 B</p>
+    </div>
+""", unsafe_allow_html=True)
+
 st.markdown("---")
 
 # Menú lateral
@@ -50,13 +207,21 @@ metodo = st.sidebar.selectbox(
 
 # EULER MEJORADO
 if metodo == "Euler Mejorado":
-    st.header("Método de Euler Mejorado")
-    st.write("Resuelve ecuaciones diferenciales de la forma: **dy/dx = f(x, y)**")
+    st.markdown("""
+        <div style='background-color: #f5f5f5; padding: 20px; border-left: 4px solid #367C2B; border-radius: 4px; margin-bottom: 20px;'>
+            <h2 style='margin-top: 0; color: #367C2B;'>Metodo de Euler Mejorado</h2>
+            <p style='color: #555; margin: 5px 0; font-size: 1.02em;'>Resuelve ecuaciones diferenciales de la forma: <strong>dy/dx = f(x, y)</strong></p>
+        </div>
+    """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("Parámetros")
+        st.markdown("""
+            <div style='background-color: #f9f9f9; padding: 15px; border-radius: 4px;'>
+                <h3 style='color: #367C2B; margin-top: 0;'>Parametros</h3>
+            </div>
+        """, unsafe_allow_html=True)
         ecuacion = st.text_input(
             "Ecuación f(x, y):",
             value="x + 2*y",
@@ -68,7 +233,11 @@ if metodo == "Euler Mejorado":
         x_final = st.number_input("x final:", value=2.0)
     
     with col2:
-        st.subheader("Ejemplos")
+        st.markdown("""
+            <div style='background-color: #f9f9f9; padding: 15px; border-radius: 4px;'>
+                <h3 style='color: #367C2B; margin-top: 0;'>Ejemplos</h3>
+            </div>
+        """, unsafe_allow_html=True)
         st.code("x + 2*y\nx - y\ny*sin(x)")
     
     if st.button("Calcular", key="euler"):
@@ -117,11 +286,19 @@ if metodo == "Euler Mejorado":
                     })
             
             # Mostrar tabla
-            st.subheader("Resultados")
+            st.markdown("""
+                <div style='background-color: #f9f9f9; padding: 15px; border-radius: 4px; margin-top: 20px; margin-bottom: 20px;'>
+                    <h3 style='color: #367C2B; margin-top: 0;'>Resultados</h3>
+                </div>
+            """, unsafe_allow_html=True)
             st.dataframe(pd.DataFrame(datos_tabla), width='stretch')
             
             if f_exacta is None:
-                st.info("SymPy no pudo encontrar solución analítica exacta. El 'Error Absoluto' no está disponible.")
+                st.markdown("""
+                    <div style='background-color: #e3f2fd; border-left: 4px solid #367C2B; border-radius: 4px; padding: 15px;'>
+                        <p style='margin: 0; color: #555;'>SymPy no pudo encontrar solucion analitica exacta. El error relativo no está disponible.</p>
+                    </div>
+                """, unsafe_allow_html=True)
             
             # Mostrar gráfica
             fig, ax = plt.subplots(figsize=(10, 6))
@@ -135,17 +312,30 @@ if metodo == "Euler Mejorado":
             st.pyplot(fig)
             
         except Exception as e:
-            st.error(f"Error: {str(e)}")
+            st.markdown(f"""
+                <div style='background-color: #ffebee; border-left: 4px solid #c62828; border-radius: 4px; padding: 20px;'>
+                    <p style='margin: 0; color: #c62828; font-weight: 600;'>Error en el calculo</p>
+                    <p style='margin: 8px 0 0 0; color: #555; font-size: 0.95em;'>{str(e)}</p>
+                </div>
+            """, unsafe_allow_html=True)
 
 # RUNGE-KUTTA 4
 elif metodo == "Runge-Kutta 4":
-    st.header("Método de Runge-Kutta 4")
-    st.write("Resuelve ecuaciones diferenciales: **dy/dx = f(x, y)** (más preciso)")
+    st.markdown("""
+        <div style='background-color: #f5f5f5; padding: 20px; border-left: 4px solid #367C2B; border-radius: 4px; margin-bottom: 20px;'>
+            <h2 style='margin-top: 0; color: #367C2B;'>Metodo de Runge-Kutta 4</h2>
+            <p style='color: #555; margin: 5px 0; font-size: 1.02em;'>Resuelve ecuaciones diferenciales: <strong>dy/dx = f(x, y)</strong> (Alta precision)</p>
+        </div>
+    """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("Parámetros")
+        st.markdown("""
+            <div style='background-color: #f9f9f9; padding: 15px; border-radius: 4px;'>
+                <h3 style='color: #367C2B; margin-top: 0;'>Parametros</h3>
+            </div>
+        """, unsafe_allow_html=True)
         ecuacion = st.text_input(
             "Ecuación f(x, y):",
             value="y - x**2 + 1",
@@ -157,7 +347,11 @@ elif metodo == "Runge-Kutta 4":
         x_end = st.number_input("x final:", value=2.0, key="rk4_xend")
     
     with col2:
-        st.subheader("Ejemplos")
+        st.markdown("""
+            <div style='background-color: #f9f9f9; padding: 15px; border-radius: 4px;'>
+                <h3 style='color: #367C2B; margin-top: 0;'>Ejemplos</h3>
+            </div>
+        """, unsafe_allow_html=True)
         st.code("y - x**2 + 1\n-2*x*y\ny*sin(x)\nx + y")
     
     if st.button("Calcular", key="rk4"):
@@ -173,7 +367,11 @@ elif metodo == "Runge-Kutta 4":
             x, y, k1, k2, k3, k4 = runge_kutta4(f, x0, y0, x_end, h)
             
             # Mostrar tabla
-            st.subheader("Resultados")
+            st.markdown("""
+                <div style='background-color: #f9f9f9; padding: 15px; border-radius: 4px; margin-top: 20px; margin-bottom: 20px;'>
+                    <h3 style='color: #367C2B; margin-top: 0;'>Resultados</h3>
+                </div>
+            """, unsafe_allow_html=True)
             df_data = {
                 "x": x,
                 "y": y,
@@ -195,17 +393,30 @@ elif metodo == "Runge-Kutta 4":
             st.pyplot(fig)
             
         except Exception as e:
-            st.error(f" Error: {str(e)}")
+            st.markdown(f"""
+                <div style='background-color: #ffebee; border-left: 4px solid #c62828; border-radius: 4px; padding: 20px;'>
+                    <p style='margin: 0; color: #c62828; font-weight: 600;'>Error en el calculo</p>
+                    <p style='margin: 8px 0 0 0; color: #555; font-size: 0.95em;'>{str(e)}</p>
+                </div>
+            """, unsafe_allow_html=True)
 
 # NEWTON-RAPHSON
 elif metodo == "Newton-Raphson":
-    st.header("Método de Newton-Raphson")
-    st.write("Encuentra raíces de funciones: **f(x) = 0**")
+    st.markdown("""
+        <div style='background-color: #f5f5f5; padding: 20px; border-left: 4px solid #367C2B; border-radius: 4px; margin-bottom: 20px;'>
+            <h2 style='margin-top: 0; color: #367C2B;'>Metodo de Newton-Raphson</h2>
+            <p style='color: #555; margin: 5px 0; font-size: 1.02em;'>Encuentra raices de funciones: <strong>f(x) = 0</strong></p>
+        </div>
+    """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("Parámetros")
+        st.markdown("""
+            <div style='background-color: #f9f9f9; padding: 15px; border-radius: 4px;'>
+                <h3 style='color: #367C2B; margin-top: 0;'>Parametros</h3>
+            </div>
+        """, unsafe_allow_html=True)
         ecuacion = st.text_input(
             "Función f(x):",
             value="x**2 - 4",
@@ -216,7 +427,11 @@ elif metodo == "Newton-Raphson":
         max_iter = st.number_input("Máximo de iteraciones:", value=1000, key="nr_iter")
     
     with col2:
-        st.subheader("Ejemplos")
+        st.markdown("""
+            <div style='background-color: #f9f9f9; padding: 15px; border-radius: 4px;'>
+                <h3 style='color: #367C2B; margin-top: 0;'>Ejemplos</h3>
+            </div>
+        """, unsafe_allow_html=True)
         st.code("x**2 - 4\nx**3 - 2*x - 5\nsin(x) - x/2\nx**2 - 2")
     
     if st.button("Calcular", key="nr"):
@@ -240,10 +455,19 @@ elif metodo == "Newton-Raphson":
             raiz, iteraciones = newton_raphson(f, df, x0, tol, max_iter)
             
             if raiz is not None:
-                st.success(f" Raíz encontrada: **{raiz:.10f}**")
+                st.markdown("""
+                    <div style='background-color: #e8f5e9; border-left: 4px solid #367C2B; border-radius: 4px; padding: 20px; text-align: center; margin: 20px 0;'>
+                        <p style='margin: 0; color: #555; font-size: 0.95em;'>RAIZ ENCONTRADA</p>
+                        <p style='margin: 10px 0 0 0; color: #367C2B; font-size: 2em; font-weight: 700;'>{:.10f}</p>
+                    </div>
+                """.format(raiz), unsafe_allow_html=True)
                 
                 # Mostrar tabla de iteraciones con detalles
-                st.subheader("Iteraciones")
+                st.markdown("""
+                    <div style='background-color: #f9f9f9; padding: 15px; border-radius: 4px; margin-top: 20px; margin-bottom: 20px;'>
+                        <h3 style='color: #367C2B; margin-top: 0;'>Iteraciones</h3>
+                    </div>
+                """, unsafe_allow_html=True)
                 tabla_iteraciones = {
                     "i": list(range(len(iteraciones))),
                     "x": iteraciones,
@@ -270,15 +494,29 @@ elif metodo == "Newton-Raphson":
                 ax.legend()
                 st.pyplot(fig)
             else:
-                st.warning(" No se encontró raíz. Intenta con otros parámetros.")
+                st.markdown("""
+                    <div style='background-color: #fff3e0; border-left: 4px solid #f57c00; border-radius: 4px; padding: 20px; text-align: center;'>
+                        <p style='margin: 0; color: #555; font-size: 1em;'>No se encontro raiz convergente. Intenta con otros parametros.</p>
+                    </div>
+                """, unsafe_allow_html=True)
             
         except Exception as e:
-            st.error(f" Error: {str(e)}")
+            st.markdown(f"""
+                <div style='background-color: #ffebee; border-left: 4px solid #c62828; border-radius: 4px; padding: 20px;'>
+                    <p style='margin: 0; color: #c62828; font-weight: 600;'>Error en el calculo</p>
+                    <p style='margin: 8px 0 0 0; color: #555; font-size: 0.95em;'>{str(e)}</p>
+                </div>
+            """, unsafe_allow_html=True)
 
-# Footer
+# Footer corporativo
 st.markdown("---")
 st.markdown("""
-    <div style='text-align: center'>
-        <p>Métodos Numéricos • Desarrollado por Jesus Omar Morales Valenzuela 8 B</p>
+    <div style='background-color: #367C2B; padding: 30px; text-align: center; border-radius: 8px; margin-top: 40px;'>
+        <p style='color: white; margin: 0; font-size: 1.05em; letter-spacing: 0.5px; font-weight: 500;'>
+            METODOS NUMERICOS - SOLUCION INNOVADORA
+        </p>
+        <p style='color: #FFCC00; margin: 8px 0 0 0; font-size: 0.95em;'>
+            Desarrollado por Jesus Omar Morales Valenzuela
+        </p>
     </div>
 """, unsafe_allow_html=True)
